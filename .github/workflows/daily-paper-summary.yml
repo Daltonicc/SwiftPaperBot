@@ -32,8 +32,11 @@ jobs:
         echo "SLACK_BOT_TOKEN=${{ secrets.SLACK_BOT_TOKEN }}" >> config.env
         echo "SLACK_CHANNEL=${{ secrets.SLACK_CHANNEL }}" >> config.env
         echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> config.env
-        echo "ARXIV_MAX_RESULTS=10" >> config.env
-        echo "ARXIV_SEARCH_TERMS=Swift,iOS,iPhone,iPad,SwiftUI,Objective-C,UIKit,Core Data,WatchOS,tvOS" >> config.env
+        echo "ARXIV_MAX_RESULTS=50" >> config.env
+        echo "ARXIV_SEARCH_DAYS=365" >> config.env
+        echo "ARXIV_SEARCH_TERMS=\"Swift programming\",\"iOS development\",\"SwiftUI\",\"iPhone app\",\"iPad app\",\"Objective-C\",\"UIKit\",\"Core Data\",\"WatchOS\",\"tvOS\",\"macOS development\",\"visionOS\",\"Vision Pro\",\"Xcode\",\"App Store\",\"Apple SDK\",\"iOS SDK\",\"Swift language\",\"mobile development\"" >> config.env
+        echo "MIN_RELEVANCE_SCORE=5" >> config.env
+        echo "MAX_DAILY_PAPERS=3" >> config.env
         echo "DATABASE_PATH=./data/papers.db" >> config.env
         echo "LOG_LEVEL=INFO" >> config.env
         echo "LOG_FILE=./logs/slackbot.log" >> config.env
