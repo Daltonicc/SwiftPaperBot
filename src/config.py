@@ -12,8 +12,12 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
 config_path = os.path.join(project_root, 'config.env')
 
-# 환경 변수 로드 (명시적 경로 지정)
-load_dotenv(config_path)
+# config.env 파일이 있으면 로드 (절대 경로 명시)
+if os.path.exists(config_path):
+    load_dotenv(config_path)
+    print(f"환경 변수 로드됨: {config_path}")
+else:
+    print(f"config.env 파일을 찾을 수 없습니다: {config_path}")
 
 class Config:
     """애플리케이션 설정 클래스"""
@@ -26,11 +30,16 @@ class Config:
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     
     # arXiv 설정
-    ARXIV_MAX_RESULTS = int(os.getenv("ARXIV_MAX_RESULTS", "10"))
+    ARXIV_MAX_RESULTS = int(os.getenv("ARXIV_MAX_RESULTS", "50"))
+    ARXIV_SEARCH_DAYS = int(os.getenv("ARXIV_SEARCH_DAYS", "30"))
     ARXIV_SEARCH_TERMS = os.getenv(
         "ARXIV_SEARCH_TERMS", 
-        "Swift,iOS,iPhone,iPad,SwiftUI,Objective-C,UIKit,Core Data"
+        "Swift,iOS,iPhone,iPad,SwiftUI,Objective-C,UIKit,Core Data,WatchOS,tvOS,macOS,visionOS,Vision Pro,Xcode,App Store,Apple"
     ).split(",")
+    
+    # 필터링 설정
+    MIN_RELEVANCE_SCORE = int(os.getenv("MIN_RELEVANCE_SCORE", "5"))
+    MAX_DAILY_PAPERS = int(os.getenv("MAX_DAILY_PAPERS", "3"))
     
     # 데이터베이스 설정
     DATABASE_PATH = os.getenv("DATABASE_PATH", "./data/papers.db")
@@ -60,6 +69,11 @@ class Config:
             logging.error(f"config.env 존재 여부: {os.path.exists(config_path)}")
             return False
         
+        print("✅ 모든 필수 환경 변수가 설정되었습니다.")
+        print(f"📊 검색 설정: 최대 {cls.ARXIV_MAX_RESULTS}개 논문, 최근 {cls.ARXIV_SEARCH_DAYS}일")
+        print(f"�� 필터링: 관련성 {cls.MIN_RELEVANCE_SCORE}점 이상, 일일 최대 {cls.MAX_DAILY_PAPERS}편")
+        print(f"🔍 검색 키워드: {', '.join(cls.ARXIV_SEARCH_TERMS[:5])}..." + (" (등 총 %d개)" % len(cls.ARXIV_SEARCH_TERMS)))
+        
         return True
     
     @classmethod
@@ -70,11 +84,17 @@ class Config:
         if log_dir and not os.path.exists(log_dir):
             os.makedirs(log_dir)
         
+        # 로깅 레벨 설정
+        level = getattr(logging, cls.LOG_LEVEL.upper(), logging.INFO)
+        
+        # 로거 설정
         logging.basicConfig(
-            level=getattr(logging, cls.LOG_LEVEL.upper()),
+            level=level,
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
             handlers=[
                 logging.FileHandler(cls.LOG_FILE, encoding='utf-8'),
                 logging.StreamHandler()
             ]
-        ) 
+        )
+        
+        return logging.getLogger(__name__) 
