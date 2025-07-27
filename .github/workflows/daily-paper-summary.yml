@@ -1,9 +1,9 @@
 name: Swift 논문 요약 봇 자동 실행
 
 on:
-  schedule:
+  # schedule:
     # 매일 오전 8시 (한국 시간 기준 - UTC+9이므로 23시에 실행)
-    - cron: '0 23 * * *'
+  #  - cron: '0 23 * * *'
   
   # 수동 실행도 가능하도록 설정
   workflow_dispatch:
